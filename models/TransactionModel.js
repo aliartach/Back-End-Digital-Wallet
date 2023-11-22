@@ -1,7 +1,8 @@
 // models/Transaction.js
 import { DataTypes } from 'sequelize';
 import Sequelize from '../config/database.js'; 
-
+import User from './User.js';
+import Promotion from './Promotion.js';
 const Transaction = Sequelize.define('Transaction', {
   id:{
     type:DataTypes.INTEGER,
@@ -9,7 +10,7 @@ const Transaction = Sequelize.define('Transaction', {
     autoIncrement:true
  },
   amount: {
-    type: DataTypes.DECIMAL(10, 2),
+    type: DataTypes.FLOAT(10, 2),
     allowNull: false,
   },
   date: {
@@ -46,14 +47,14 @@ const Transaction = Sequelize.define('Transaction', {
 
 } , { timestamps: true });
 
-Transaction.pre('find', function(next) {
-  this.populate('Users');
-  next();
-});
-Transaction.pre('find', function(next) {
-  this.populate('Promotion');
-  next();
-});
+// Transaction.pre('find', function(next) {
+//   this.populate('Users');
+//   next();
+// });
+// Transaction.pre('find', function(next) {
+//   this.populate('Promotion');
+//   next();
+// });
 
 
 User.hasMany(Transaction, { foreignKey: 'senderId', as: 'sentTransactions' });
