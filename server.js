@@ -1,9 +1,8 @@
 import express from  "express";
 import dotenv from 'dotenv';
-import promotionRouter from "./routes/PromotionRoute.js";
+import promotionRouter from "../routes/PromotionRoute.js";
 
 const app = express();
-const PORT = process.env.PORT
 
 // Middleware
 app.use(express.json());
@@ -18,4 +17,3 @@ app.listen(process.env.PORT, () => {
 
 
 
-  // app.use('/promotions', Promotion);

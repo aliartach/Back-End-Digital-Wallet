@@ -1,4 +1,4 @@
-import Promotion from "../models/PromotionModel.js";
+import Promotion from "../routes/promotionRoute.js";
 
 class promotionController {
     static async getPromotions(req,res){
