@@ -1,6 +1,6 @@
 import Transaction from "../models/TransactionModel.js";
-import User from '../models/User';
-import Promotion from '../models/Promotion';
+import User from "../models/User.js";
+import Promotion from '../models/Promotion.js';
 
 const getAllTransactions = async (req, res) => {
   try {
