@@ -7,14 +7,14 @@ import {
   deleteTransaction,
 } from '../controllers/TransactionController.js';
 
-const router = express.Router();
+const TransactionRoute = express.Router();
 
 // Routes
-router.get('/transactions', getAllTransactions);
-router.get('/transactions/:id', getTransactionById);
-router.post('/transactions', createTransaction);
-router.patch('/transactions/:id', updateTransaction);
-router.delete('/transactions/:id', deleteTransaction);
+TransactionRoute.get('/transactions', getAllTransactions);
+TransactionRoute.get('/transactions/:id', getTransactionById);
+TransactionRoute.post('/transactions', createTransaction);
+TransactionRoute.patch('/transactions/:id', updateTransaction);
+TransactionRoute.delete('/transactions/:id', deleteTransaction);
 
-export default router;
+export default TransactionRoute;
 

@@ -46,14 +46,7 @@ const Transaction = Sequelize.define('Transaction', {
 
 } , { timestamps: true });
 
-Transaction.pre('find', function(next) {
-  this.populate('Users');
-  next();
-});
-Transaction.pre('find', function(next) {
-  this.populate('Promotion');
-  next();
-});
+
 
 
 User.hasMany(Transaction, { foreignKey: 'senderId', as: 'sentTransactions' });
