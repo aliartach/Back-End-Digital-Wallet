@@ -29,13 +29,10 @@ const getTransactionById = async (req, res) => {
 };
 const createTransaction = async (req, res) => {
   try {
-    const { amount, date, moneyType } = req.body;
+    const { amount, date, moneyType , senderId , receiverId } = req.body;
 
-   
-    const sender = await User.findByPk(senderId);
-    const receiver = await User.findByPk(receiverId);
 
-    if (!sender || !receiver) {
+    if (!senderId|| !receiverId) {
       return res.status(404).json({ error: 'Sender or receiver not found' });
     }
 
@@ -50,7 +47,9 @@ const createTransaction = async (req, res) => {
     const transaction = await Transaction.create({
       amount,
       date,
-      moneyType: moneyType.toUpperCase()
+      moneyType,
+      senderId,
+      receiverId
     });
 
     return res.status(201).json(transaction);
@@ -71,10 +70,8 @@ const updateTransaction = async (req, res) => {
       return res.status(404).json({ error: 'Transaction not found' });
     }
 
-    const sender = await User.findByPk(senderId);
-    const receiver = await User.findByPk(receiverId);
 
-    if (!sender || !receiver) {
+    if (!senderId || !receiverId) {
       return res.status(404).json({ error: 'Sender or receiver not found' });
     }
 

@@ -11,6 +11,7 @@ import transactionRoutes from "./routes/TransactionRoute.js"
 const app = express();
 dotenv.config();
 
+
 // Middleware
 app.use(express.json());
 app.use(cors());
@@ -29,7 +30,14 @@ app.use((req, res, next) => {
 app.use("/api", userRoutes);
 app.use('/api', transactionRoutes);
 
-//listen to port
+sequelize.sync({ alter: false, force: false })
+  .then(() => {
+    console.log('Models synchronized with the database');
+  })
+  .catch((error) => {
+    console.error('Error synchronizing models:', error);
+  });
+  
 app.listen(process.env.PORT, () => {
   console.log("listening on port", process.env.PORT);
 });

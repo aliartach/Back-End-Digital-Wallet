@@ -2,7 +2,7 @@
 import { DataTypes } from 'sequelize';
 import Sequelize from '../config/database.js'; 
 import User from './User.js';
-import Promotion from './Promotion.js';
+// import Promotion from './Promotion.js';
 const Transaction = Sequelize.define('Transaction', {
   id:{
     type:DataTypes.INTEGER,
@@ -14,11 +14,11 @@ const Transaction = Sequelize.define('Transaction', {
     allowNull: false,
   },
   date: {
-    type: DataTypes.DATE,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   moneyType: {
-    type: DataTypes.ENUM('usd', 'usdt'),
+    type: DataTypes.ENUM('USD', 'USDT'),
     allowNull: false,
   }, 
   senderId: {
@@ -37,13 +37,13 @@ const Transaction = Sequelize.define('Transaction', {
       key: 'id',
     },
   },
-  promotionsId: {
-    type: DataTypes.INTEGER,
-    references: {
-      model: Promotion,
-      key: 'id',
-    },
-  }, 
+  // promotionsId: {
+  //   type: DataTypes.INTEGER,
+  //   references: {
+  //     model: Promotion,
+  //     key: 'id',
+  //   },
+  // }, 
 
 } , { timestamps: true });
 
