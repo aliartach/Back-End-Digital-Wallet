@@ -8,6 +8,7 @@ import sequelize from "./config/database.js";
 import userRoutes from "./routes/UserRoutes.js";
 import transactionRoutes from "./routes/TransactionRoute.js"
 import promotionRouter  from "./routes/promotionRoute.js";
+import  notificationRouter from "./routes/TransactionRoute.js";
 const app = express();
 dotenv.config();
 
@@ -15,6 +16,7 @@ dotenv.config();
 
 
 const PORT = process.env.PORT
+
 
 // Middleware
 app.use(express.json());
@@ -34,6 +36,7 @@ app.use((req, res, next) => {
 app.use("/api", userRoutes);
 app.use('/api', transactionRoutes);
 app.use('/api', promotionRouter )
+app.use('/api', notificationRouter )
 
 //listen to port 
 app.listen(process.env.PORT, () => {

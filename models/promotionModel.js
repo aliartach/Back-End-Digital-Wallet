@@ -29,8 +29,11 @@ const Promotion = sequelize.define('Promotion', {
     // userId:{
     //     type: DataTypes.INTEGER,
     //     references: {
+        // onDelete: 'CASCADE',
+        // onUpdate: 'CASCADE',
     //         model: user,
-    //         key: 'id'
+    //         key: 'id',
+            //    as: 'userId'
     //     }
     // }
     });
