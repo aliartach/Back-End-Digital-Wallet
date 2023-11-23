@@ -1,6 +1,6 @@
 import express from  "express";
 import dotenv from 'dotenv';
-import promotionRouter from "./routes/promotionRoute.js";
+import promotionRouter from "./routes/PromotionRoute.js";
 
 const app = express();
 const PORT = process.env.PORT

@@ -26,7 +26,16 @@ const Promotion = sequelize.define('Promotion', {
     percentage:{
        type: DataTypes.STRING,
     },
+    // userId:{
+    //     type: DataTypes.INTEGER,
+    //     references: {
+    //         model: user,
+    //         key: 'id'
+    //     }
+    // }
     });
+
+    // User.hasMany(Promotion, { foreignKey: 'userId', as : 'userid'});
     
     Promotion.sync();
     
