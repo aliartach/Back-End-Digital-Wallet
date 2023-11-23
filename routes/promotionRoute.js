@@ -1,4 +1,4 @@
-import promotionController from "../controllers/PromotionController.js";
+import promotionController from "../controllers/promotionController.js";
 import express from "express";
 
 const promotionRouter = express.Router()
