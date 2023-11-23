@@ -1,6 +1,6 @@
 import Transaction from "../models/TransactionModel.js";
 import User from "../models/User.js";
-import Promotion from '../models/Promotion.js';
+// import Promotion from '../models/Promotion.js';
 
 const getAllTransactions = async (req, res) => {
   try {
@@ -39,12 +39,12 @@ const createTransaction = async (req, res) => {
       return res.status(404).json({ error: 'Sender or receiver not found' });
     }
 
-    if (promotionsId) {
-      const promotion = await Promotion.findByPk(promotionsId);
-      if (!promotion) {
-        return res.status(404).json({ error: 'Promotion not found' });
-      }
-    }
+    // if (promotionsId) {
+    //   const promotion = await Promotion.findByPk(promotionsId);
+    //   if (!promotion) {
+    //     return res.status(404).json({ error: 'Promotion not found' });
+    //   }
+    // }
 
     // Create transaction
     const transaction = await Transaction.create({
@@ -79,12 +79,12 @@ const updateTransaction = async (req, res) => {
     }
 
 
-    if (promotionsId) {
-      const promotion = await Promotion.findByPk(promotionsId);
-      if (!promotion) {
-        return res.status(404).json({ error: 'Promotion not found' });
-      }
-    }
+    // if (promotionsId) {
+    //   const promotion = await Promotion.findByPk(promotionsId);
+    //   if (!promotion) {
+    //     return res.status(404).json({ error: 'Promotion not found' });
+    //   }
+    // }
 
 
     await transaction.update({
