@@ -28,6 +28,7 @@ app.use((req, res, next) => {
 
 app.use("/api", userRoutes);
 app.use('/api', transactionRoutes);
+
 //listen to port
 app.listen(process.env.PORT, () => {
   console.log("listening on port", process.env.PORT);
