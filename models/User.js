@@ -1,6 +1,6 @@
 import sequelize from "../config/database.js";
-import bcrypt, { hash } from "bcrypt";
-import { Sequelize, DataTypes } from "sequelize";
+import bcrypt from "bcrypt";
+import { DataTypes } from "sequelize";
 
 const User = sequelize.define("User", {
   id: {
@@ -19,6 +19,10 @@ const User = sequelize.define("User", {
   lastName: {
     type: DataTypes.STRING,
     allowNull: false,
+    validate: {
+      notNull: { msg: "Last name is required" },
+      notEmpty: { msg: "Last name must not be empty" },
+    },
   },
   email: {
     type: DataTypes.STRING,
@@ -45,10 +49,12 @@ const User = sequelize.define("User", {
   balanceUSD: {
     type: DataTypes.FLOAT,
     allowNull: true,
+    defaultValue: 0,
   },
   balanceUSDT: {
     type: DataTypes.FLOAT,
     allowNull: true,
+    defaultValue: 0,
   },
   role: {
     type: DataTypes.ENUM("admin", "user", "merchant"),
@@ -59,10 +65,5 @@ const User = sequelize.define("User", {
     defaultValue: false,
   },
 });
-
-// (async () => {
-//   await sequelize.sync({ force: true });
-// })();
-console.log(User === sequelize.models.User); // true
 
 export default User;

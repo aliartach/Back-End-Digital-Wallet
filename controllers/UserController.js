@@ -1,4 +1,4 @@
-import User from "../models/User.js";
+import { User, Promotion, Notification, Transaction } from "../models/index.js";
 
 // Get all users
 const getUsers = async (req, res) => {
@@ -65,7 +65,6 @@ const deleteUser = async (req, res) => {
     } else {
       res.status(404).json({ error: "User not found" });
     }
-    
   } catch (error) {
     res.status(500).json(error.message);
   }
