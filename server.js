@@ -4,11 +4,12 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import sequelize from "./config/database.js";
+
 //Routes
 import userRoutes from "./routes/UserRoutes.js";
 import transactionRoutes from "./routes/TransactionRoute.js"
 import promotionRouter  from "./routes/promotionRoute.js";
-import  notificationRouter from "./routes/TransactionRoute.js";
+import notificationRouter from "./routes/NotificationRoute.js";
 const app = express();
 dotenv.config();
 

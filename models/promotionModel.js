@@ -40,7 +40,7 @@ const Promotion = sequelize.define('Promotion', {
 
     // User.hasMany(Promotion, { foreignKey: 'userId', as : 'userid'});
     
-    Promotion.sync();
+    // Promotion.sync();
     
     export default Promotion;
 
