@@ -14,9 +14,9 @@ Promotion.belongsTo(User, {
 });
 
 User.hasMany(Transaction, {
-   foreignKey: "senderId",
-    as: "sentTransactions"
-   });
+  foreignKey: "senderId",
+  as: "sentTransactions",
+});
 
 User.hasMany(Transaction, {
   foreignKey: "receiverId",

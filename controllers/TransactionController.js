@@ -1,4 +1,5 @@
 import { Transaction, User, Promotion } from "../models/index.js";
+import sequelize from "../config/database.js";
 
 // Get all transactions
 export const getAllTransactions = async (req, res) => {
@@ -9,6 +10,7 @@ export const getAllTransactions = async (req, res) => {
         { model: User, as: "receiver" },
         { model: Promotion, as: "promotion" },
       ],
+      order: [["id", "DESC"]],
     });
     res.json(transactions);
   } catch (error) {
@@ -40,43 +42,77 @@ export const getTransactionById = async (req, res) => {
 
 // Create a new transaction
 export const createTransaction = async (req, res) => {
-  const {
-    amount,
-    date,
-    moneyType,
-    senderId,
-    receiverId,
-    promotionId,
-  } = req.body;
+  const { amount, date, moneyType, senderId, receiverId, promoCode } = req.body;
+
   try {
-    const sender = await User.findByPk(senderId);
-    if (!sender) {
-      return res.status(404).json({ error: "Sender not found" });
-    }
+    const transaction = await sequelize.transaction(async (t) => {
+      const [sender, receiver] = await Promise.all([
+        User.findByPk(senderId, { transaction: t }),
+        User.findByPk(receiverId, { transaction: t }),
+      ]);
 
-    const receiver = await User.findByPk(receiverId);
-    if (!receiver) {
-      return res.status(404).json({ error: "Receiver not found" });
-    }
+      if (!sender || !receiver) {
+        return res.status(404).json({ error: "Invalid sender or receiver" });
+      }
 
-    const promotion = await Promotion.findByPk(promotionId);
-    if (promotionId && !promotion) {
-      return res.status(404).json({ error: "Promotion not found" });
-    }
+      let promotion = null;
+      let discount = 0;
+      let newAmount = amount;
 
-    const transaction = await Transaction.create({
-      amount,
-      date,
-      moneyType,
-      senderId,
-      receiverId,
-      promotionId,
+      if (promoCode) {
+        promotion = await Promotion.findOne({
+          where: { promoCode: promoCode },
+          transaction: t,
+        });
+
+        if (!promotion) {
+          return res.status(404).json({ error: "Invalid promotion" });
+        }
+
+        discount = promotion.percentage;
+        newAmount = amount - (amount * discount) / 100;
+      }
+
+      if (moneyType === "usd") {
+        if (sender.balanceUSD < amount) {
+          return res.status(400).json({ error: "Insufficient funds" });
+        }
+
+        await sender.decrement("balanceUSD", { by: newAmount, transaction: t });
+        await receiver.increment("balanceUSD", {
+          by: newAmount,
+          transaction: t,
+        });
+        await receiver.decrement("balanceUSDT", { by: amount, transaction: t });
+        await sender.increment("balanceUSDT", { by: amount, transaction: t });
+      } else if (moneyType === "usdt") {
+        if (sender.balanceUSDT < amount) {
+          return res.status(400).json({ error: "Insufficient funds" });
+        }
+
+        await sender.decrement("balanceUSDT", { by: amount, transaction: t });
+        await receiver.increment("balanceUSDT", { by: amount, transaction: t });
+      } else {
+        return res.status(400).json({ error: "Invalid money type" });
+      }
+
+      await Transaction.create(
+        {
+          amount: newAmount,
+          date,
+          moneyType,
+          senderId,
+          receiverId,
+          promotionId: promoCode ? promotion.id : null,
+        },
+        { transaction: t }
+      );
     });
 
-    res.status(201).json(transaction);
+    res.status(200).json({ success: true, message: "Money sent successfully" });
   } catch (error) {
     console.error("Failed to create transaction:", error);
-    res.status(500).json({ error: "Failed to create transaction" });
+    return res.status(500).json({ error: "Failed to create transaction" });
   }
 };
 

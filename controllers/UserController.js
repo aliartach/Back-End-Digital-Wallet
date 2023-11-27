@@ -1,5 +1,6 @@
 import { User, Promotion, Notification, Transaction } from "../models/index.js";
-
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 // Get all users
 const getUsers = async (req, res) => {
   try {
@@ -70,4 +71,44 @@ const deleteUser = async (req, res) => {
   }
 };
 
-export { getUsers, getUserById, createUser, updateUser, deleteUser };
+const signInUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({
+      where: { email },
+    });
+    if (!user) {
+      return res.status(404).json("Email not found");
+    }
+
+    // Verify password
+    const passwordValid = await bcrypt.compare(password, user.password);
+    if (!passwordValid) {
+      return res.status(404).json("Incorrect password");
+    }
+
+    // Authenticate user with jwt
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRATION,
+    });
+
+    res.status(200).json({
+      sucess: true,
+      id: user.id,
+      email: user.email,
+      accessToken: token,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+export {
+  getUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser,
+  signInUser,
+};

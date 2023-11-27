@@ -22,6 +22,7 @@ const Transaction = sequelize.define(
     },
     date: {
       type: DataTypes.DATE,
+      defaultValue: Date.now,
       allowNull: false,
     },
     moneyType: {
