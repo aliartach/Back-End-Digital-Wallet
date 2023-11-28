@@ -1,10 +1,11 @@
 import { User, Promotion, Notification, Transaction } from "../models/index.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+
 // Get all users
 const getUsers = async (req, res) => {
   try {
-    const users = await User.findAll();
+    const users = await User.findAll({ order: [["id", "DESC"]]});
     res.json(users);
   } catch (error) {
     res.status(500).json(error.message);
@@ -89,7 +90,7 @@ const signInUser = async (req, res) => {
     }
 
     // Authenticate user with jwt
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user.id ,role:user.role,email:user.email}, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRATION,
     });
 
@@ -98,6 +99,7 @@ const signInUser = async (req, res) => {
       id: user.id,
       email: user.email,
       accessToken: token,
+      role:user.role
     });
   } catch (err) {
     return res.status(500).json({ error: err.message });

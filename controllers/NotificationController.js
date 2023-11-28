@@ -4,7 +4,7 @@ import { User, Promotion, Notification, Transaction } from "../models/index.js";
 export const getAllNotifications = async (req, res) => {
   try {
     const notifications = await Notification.findAll({
-      include: [{ model: Transaction, as: "transaction" }],
+      include: [{ model: Transaction, as: "transaction" }], order: [["id", "DESC"]]
     });
     res.json(notifications);
   } catch (error) {

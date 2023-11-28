@@ -3,7 +3,7 @@ import { User, Promotion, Notification, Transaction } from "../models/index.js";
 export const getPromotions = async (req, res) => {
   try {
     const promotions = await Promotion.findAll({
-      include: [{ model: User, as: "user" }],
+      include: [{ model: User, as: "user" }], order: [["id", "DESC"]]
     });
     res.status(200).json(promotions);
   } catch (error) {
