@@ -1,87 +1,107 @@
-import Transaction from "../models/TransactionModel.js";
-import User from "../models/User.js";
-// import Promotion from '../models/Promotion.js';
+import { User , Promotion , Transaction} from "../models/index.js"
 
-const getAllTransactions = async (req, res) => {
+
+export const getAllTransactions = async (req, res) => {
   try {
-    const transactions = await Transaction.findAll();
-    return res.status(200).json(transactions);
+    const transactions = await Transaction.findAll({
+      include: [
+        { model: User, as: "sender" },
+        { model: User, as: "receiver" },
+        { model: Promotion, as: "promotion" },
+      ],
+      order: [["id", "DESC"]],
+    });
+    res.json(transactions);
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Failed to fetch transactions:", error);
+    res.status(500).json({ error: "Failed to fetch transactions" });
   }
 };
 
-const getTransactionById = async (req, res) => {
+// Get a single transaction by ID
+export const getTransactionById = async (req, res) => {
+  const { id } = req.params;
   try {
-    const { id } = req.params;
-    const transaction = await Transaction.findByPk(id);
-
+    const transaction = await Transaction.findByPk(id, {
+      include: [
+        { model: User, as: "sender" },
+        { model: User, as: "receiver" },
+        { model: Promotion, as: "promotion" },
+      ],
+    });
     if (!transaction) {
-      return res.status(404).json({ error: 'Transaction not found' });
+      return res.status(404).json({ error: "Transaction not found" });
     }
-
-    return res.status(200).json(transaction);
+    res.json(transaction);
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Failed to fetch transaction:", error);
+    res.status(500).json({ error: "Failed to fetch transaction" });
   }
 };
-const createTransaction = async (req, res) => {
+export const createTransaction = async (req, res) => {
   try {
-    const { amount, date, moneyType , senderId , receiverId } = req.body;
+    const { amount, date, moneyType } = req.body;
 
+   
+    const sender = await User.findByPk(senderId);
+    const receiver = await User.findByPk(receiverId);
 
-    if (!senderId|| !receiverId) {
+    if (!sender || !receiver) {
       return res.status(404).json({ error: 'Sender or receiver not found' });
     }
 
-    // if (promotionsId) {
-    //   const promotion = await Promotion.findByPk(promotionsId);
-    //   if (!promotion) {
-    //     return res.status(404).json({ error: 'Promotion not found' });
-    //   }
-    // }
+    if (promotionsId) {
+      const promotion = await Promotion.findByPk(promotionsId);
+      if (!promotion) {
+        return res.status(404).json({ error: 'Promotion not found' });
+      }
+    }
 
     // Create transaction
     const transaction = await Transaction.create({
       amount,
       date,
-      moneyType,
-      senderId,
-      receiverId
+      moneyType: moneyType.toUpperCase()
     });
 
-    return res.status(201).json(transaction);
+    return res.status(200).json({ success: true, message: "Money sent successfully" });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Failed to create transaction:", error);
+    return res.status(500).json({ error: "Failed to create transaction" });
   }
 };
 
-const updateTransaction = async (req, res) => {
+// Update an existing transaction
+export const updateTransaction = async (req, res) => {
+  const { id } = req.params;
+  const {
+    amount,
+    date,
+    moneyType,
+    senderId,
+    receiverId,
+    promotionId,
+  } = req.body;
   try {
-    const { id } = req.params;
-    const { amount, date, moneyType, senderId, receiverId, promotionsId } = req.body;
-
     const transaction = await Transaction.findByPk(id);
-
     if (!transaction) {
-      return res.status(404).json({ error: 'Transaction not found' });
+      return res.status(404).json({ error: "Transaction not found" });
     }
 
+    const sender = await User.findByPk(senderId);
+    const receiver = await User.findByPk(receiverId);
 
-    if (!senderId || !receiverId) {
+    if (!sender || !receiver) {
       return res.status(404).json({ error: 'Sender or receiver not found' });
     }
 
 
-    // if (promotionsId) {
-    //   const promotion = await Promotion.findByPk(promotionsId);
-    //   if (!promotion) {
-    //     return res.status(404).json({ error: 'Promotion not found' });
-    //   }
-    // }
+    if (promotionsId) {
+      const promotion = await Promotion.findByPk(promotionsId);
+      if (!promotion) {
+        return res.status(404).json({ error: 'Promotion not found' });
+      }
+    }
 
 
     await transaction.update({
@@ -92,36 +112,24 @@ const updateTransaction = async (req, res) => {
 
     return res.status(200).json(transaction);
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Failed to update transaction:", error);
+    res.status(500).json({ error: "Failed to update transaction" });
   }
 };
 
-const deleteTransaction = async (req, res) => {
+// Delete a transaction
+export const deleteTransaction = async (req, res) => {
+  const { id } = req.params;
   try {
-    const { id } = req.params;
     const transaction = await Transaction.findByPk(id);
-
     if (!transaction) {
-      return res.status(404).json({ error: 'Transaction not found' });
+      return res.status(404).json({ error: "Transaction not found" });
     }
 
-    // Delete transaction
     await transaction.destroy();
-
-    return res.status(204).json(); 
+    res.json({ message: "Transaction deleted successfully" });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Failed to delete transaction:", error);
+    res.status(500).json({ error: "Failed to delete transaction" });
   }
 };
-
-
-export {
-  getAllTransactions,
-  getTransactionById,
-  createTransaction,
-  updateTransaction,
-  deleteTransaction,
-};
-
