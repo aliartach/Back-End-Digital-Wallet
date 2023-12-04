@@ -23,7 +23,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/api", authenticateToken, userRoutes);
+app.use("/api", userRoutes);
 app.use("/api", authenticateToken, transactionRoutes);
 app.use("/api", authenticateToken, promotionRouter);
 app.use("/api", authenticateToken, notificationRouter);
