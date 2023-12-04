@@ -43,6 +43,8 @@ export const getTransactionById = async (req, res) => {
 // Create a new transaction
 export const createTransaction = async (req, res) => {
   const { amount, date, moneyType, senderId, receiverId, promoCode } = req.body;
+  
+  console.log(req.body)
 
   try {
     const transaction = await sequelize.transaction(async (t) => {
@@ -109,7 +111,7 @@ export const createTransaction = async (req, res) => {
       );
     });
 
-    res.status(200).json({ success: true, message: "Money sent successfully" });
+    return res.status(200).json({ success: true, message: "Money sent successfully" });
   } catch (error) {
     console.error("Failed to create transaction:", error);
     return res.status(500).json({ error: "Failed to create transaction" });
