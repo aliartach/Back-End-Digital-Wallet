@@ -95,11 +95,12 @@ const signInUser = async (req, res) => {
     });
 
     res.status(200).json({
-      sucess: true,
+      success: true,
       id: user.id,
       email: user.email,
       accessToken: token,
-      role:user.role
+      role:user.role,
+      verified: user.verified
     });
   } catch (err) {
     return res.status(500).json({ error: err.message });
