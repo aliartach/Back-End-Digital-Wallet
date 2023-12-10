@@ -41,7 +41,7 @@ export const getPromotion = async (req, res) => {
 
 export const updatePromotion = async (req, res) => {
   const { id } = req.params;
-  const { startDate, endDate, promoCode, description, percentage } = req.body;
+  const { startDate, endDate, promoCode, description, percentage,userId } = req.body;
   try {
     const promotion = await Promotion.findByPk(id);
     if (!promotion) {
@@ -87,7 +87,7 @@ export const deletePromotion = async (req, res) => {
       return res.status(404).json({ error: "Promotion not found" });
     }
     await promotion.destroy();
-    res.status(204).send(); // 204 No Content response
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
