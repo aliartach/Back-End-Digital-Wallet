@@ -26,7 +26,6 @@ app.use((req, res, next) => {
 app.use("/api", userRoutes);
 app.use("/api", transactionRoutes);
 app.use("/api", authenticateToken, promotionRouter);
-app.use("/api",  userRoutes);
 app.use("/api",  transactionRoutes);
 app.use("/api",  promotionRouter);
 app.use("/api", authenticateToken, notificationRouter);
