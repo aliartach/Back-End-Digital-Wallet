@@ -42,15 +42,9 @@ export const getTransactionById = async (req, res) => {
 
 // Create a new transaction
 export const createTransaction = async (req, res) => {
-  const {
-    amount,
-    date,
-    moneyType,
-    senderId,
-    receiverEmail,
-    promoCode,
-  } = req.body;
-
+  const { amount, date, senderId, receiverEmail, promoCode } = req.body;
+  let { moneyType } = req.body;
+  
   if (!amount || !moneyType || !senderId || !receiverEmail) {
     return res.status(400).json({ error: "Missing required fields" });
   }
@@ -99,6 +93,10 @@ export const createTransaction = async (req, res) => {
 
       await sender.decrement({ balanceUSDT: amount });
       await receiver.increment({ balanceUSDT: amount });
+    } else if (moneyType === "usdDeposit") {
+      moneyType = "usd";
+      await receiver.increment({ balanceUSD: amount });
+      await sender.decrement({ balanceUSD: amount });
     } else {
       return res.status(400).json({ error: "Invalid money type" });
     }
