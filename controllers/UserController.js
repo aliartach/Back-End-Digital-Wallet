@@ -90,13 +90,12 @@ const signInUser = async (req, res) => {
     }
 
     // Authenticate user with jwt
-    const token = jwt.sign({ id: user.id ,role:user.role,email:user.email}, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user.id ,role:user.role,email:user.email,verified:user.verified,firstName:user.firstName}, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRATION,
     });
 
     res.status(200).json({
       success: true,
-      id: user.id,
       email: user.email,
       accessToken: token,
       role:user.role,
