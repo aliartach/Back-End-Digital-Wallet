@@ -42,8 +42,9 @@ export const getTransactionById = async (req, res) => {
 
 // Create a new transaction
 export const createTransaction = async (req, res) => {
-  const { amount, date, moneyType, senderId, receiverId, promoCode } = req.body;
-  
+  const { amount, date, senderId, receiverEmail, promoCode } = req.body;
+  let { moneyType } = req.body;
+
   console.log(req.body)
 
   try {
@@ -94,6 +95,10 @@ export const createTransaction = async (req, res) => {
 
         await sender.decrement("balanceUSDT", { by: amount, transaction: t });
         await receiver.increment("balanceUSDT", { by: amount, transaction: t });
+      } else if (moneyType === "usdDeposit") {
+        moneyType = "usd";
+        await receiver.increment({ balanceUSD: amount });
+        await sender.decrement({ balanceUSD: amount });
       } else {
         return res.status(400).json({ error: "Invalid money type" });
       }
