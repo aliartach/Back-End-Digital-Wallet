@@ -36,80 +36,85 @@ export const getTransactionById = async (req, res) => {
     res.json(transaction);
   } catch (error) {
     console.error("Failed to fetch transaction:", error);
-    res.status(500).json({ error: "Failed to fetch transaction" });
+    return res.status(500).json({ error: "Failed to fetch transaction" });
   }
 };
 
 // Create a new transaction
 export const createTransaction = async (req, res) => {
-  const { amount, date, moneyType, senderId, receiverId, promoCode } = req.body;
+  const {
+    amount,
+    date,
+    moneyType,
+    senderId,
+    receiverEmail,
+    promoCode,
+  } = req.body;
+
+  if (!amount || !moneyType || !senderId || !receiverEmail) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
 
   try {
-    const transaction = await sequelize.transaction(async (t) => {
-      const [sender, receiver] = await Promise.all([
-        User.findByPk(senderId, { transaction: t }),
-        User.findByPk(receiverId, { transaction: t }),
-      ]);
+    const sender = await User.findByPk(senderId);
+    if (!sender) {
+      return res.status(404).json({ error: "Invalid sender" });
+    }
+    const receiver = await User.findOne({ where: { email: receiverEmail } });
 
-      if (!sender || !receiver) {
-        return res.status(404).json({ error: "Invalid sender or receiver" });
+    if (!receiver) {
+      return res.status(404).json({ error: "Invalid receiver Email " });
+    }
+
+    let promotion = null;
+    let discount = 0;
+    let newAmount = amount;
+
+    if (promoCode) {
+      promotion = await Promotion.findOne({
+        where: { promoCode: promoCode },
+      });
+
+      if (!promotion) {
+        return res.status(404).json({ error: "Invalid promotion" });
       }
 
-      let promotion = null;
-      let discount = 0;
-      let newAmount = amount;
+      discount = promotion.percentage;
+      newAmount = amount - (amount * discount) / 100;
+    }
 
-      if (promoCode) {
-        promotion = await Promotion.findOne({
-          where: { promoCode: promoCode },
-          transaction: t,
-        });
-
-        if (!promotion) {
-          return res.status(404).json({ error: "Invalid promotion" });
-        }
-
-        discount = promotion.percentage;
-        newAmount = amount - (amount * discount) / 100;
+    if (moneyType === "usd") {
+      if (sender.balanceUSD < amount) {
+        return res.status(400).json({ error: "Insufficient funds" });
       }
 
-      if (moneyType === "usd") {
-        if (sender.balanceUSD < amount) {
-          return res.status(400).json({ error: "Insufficient funds" });
-        }
-
-        await sender.decrement("balanceUSD", { by: newAmount, transaction: t });
-        await receiver.increment("balanceUSD", {
-          by: newAmount,
-          transaction: t,
-        });
-        await receiver.decrement("balanceUSDT", { by: amount, transaction: t });
-        await sender.increment("balanceUSDT", { by: amount, transaction: t });
-      } else if (moneyType === "usdt") {
-        if (sender.balanceUSDT < amount) {
-          return res.status(400).json({ error: "Insufficient funds" });
-        }
-
-        await sender.decrement("balanceUSDT", { by: amount, transaction: t });
-        await receiver.increment("balanceUSDT", { by: amount, transaction: t });
-      } else {
-        return res.status(400).json({ error: "Invalid money type" });
+      await sender.decrement({ balanceUSD: newAmount });
+      await receiver.increment({ balanceUSD: newAmount });
+      await receiver.decrement({ balanceUSDT: amount });
+      await sender.increment({ balanceUSDT: amount });
+    } else if (moneyType === "usdt") {
+      if (sender.balanceUSDT < amount) {
+        return res.status(400).json({ error: "Insufficient funds" });
       }
 
-      await Transaction.create(
-        {
-          amount: newAmount,
-          date,
-          moneyType,
-          senderId,
-          receiverId,
-          promotionId: promoCode ? promotion.id : null,
-        },
-        { transaction: t }
-      );
+      await sender.decrement({ balanceUSDT: amount });
+      await receiver.increment({ balanceUSDT: amount });
+    } else {
+      return res.status(400).json({ error: "Invalid money type" });
+    }
+
+    await Transaction.create({
+      amount: newAmount,
+      date,
+      moneyType,
+      senderId,
+      receiverId: receiver.id,
+      promotionId: promoCode ? promotion.id : null,
     });
 
-    res.status(200).json({ success: true, message: "Money sent successfully" });
+    return res
+      .status(200)
+      .json({ success: true, message: "Money sent successfully" });
   } catch (error) {
     console.error("Failed to create transaction:", error);
     return res.status(500).json({ error: "Failed to create transaction" });
