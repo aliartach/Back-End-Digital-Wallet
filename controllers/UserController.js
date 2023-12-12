@@ -104,6 +104,7 @@ io.listen(5000);
 const getUsers = async (req, res) => {
   try {
     const users = await User.findAll({ order: [["id", "DESC"]] });
+    res.json(users);
   } catch (error) {
     res.status(500).json(error.message);
   }
@@ -131,7 +132,7 @@ const createUser = async (req, res) => {
     const user = await User.create(userData);
     res.status(201).json(user);
   } catch (error) {
-    res.status(500).json(error.message);
+    res.status(500).json(error.errors[0].message);
   }
 };
 
