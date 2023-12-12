@@ -14,7 +14,6 @@ import notificationRouter from "./routes/NotificationRoute.js";
 const app = express();
 dotenv.config();
 
-
 // Middleware
 app.use(express.json());
 app.use(cors());
