@@ -8,7 +8,7 @@ const { DB_USER, DB_HOST, DB_PASSWORD, DB_NAME } = process.env;
 const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   host: DB_HOST,
   dialect: "mysql",
-  logging: console.log, //false to disable logging
+  logging: false, //false/console.log to disable logging
   define: {
     freezeTableName: true,
     timestamps: true,
