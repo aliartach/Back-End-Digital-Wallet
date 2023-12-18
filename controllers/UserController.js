@@ -33,7 +33,6 @@ io.on("connection", (socket) => {
   sharedSocket = socket;
   socket.on("newUser", (email) => {
     addNewUser(email, socket.id);
-    console.log("socket: " + socket);
     console.log("id: " + socket?.id);
     console.log("userEmail: " + email);
     onlineUsers.forEach((each) => {
@@ -51,6 +50,12 @@ io.on("connection", (socket) => {
           time,
           moneyType,
         });
+        io.to(receiver.socketId).emit("getText", {
+          senderName,
+          amount,
+          time,
+          moneyType,
+        });
         console.log("sendDirectly to:", receiver.email);
       } else {
         storePendingNotification(receiverName, {
@@ -63,10 +68,10 @@ io.on("connection", (socket) => {
     }
   );
 
-  sendOfflineUserNotifications = async (email) => {
+  sendOfflineUserNotifications = (email) => {
     console.log("Socket connected:", socket.connected);
 
-    const pendingNotifications = await getPendingNotifications(email);
+    const pendingNotifications = getPendingNotifications(email);
     console.log(
       "Number of pending notifications:",
       pendingNotifications.length

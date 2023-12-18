@@ -23,10 +23,10 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/api",  userRoutes);
-app.use("/api",  transactionRoutes);
-app.use("/api",  promotionRouter);
-app.use("/api", authenticateToken, notificationRouter);
+app.use("/api", userRoutes);
+app.use("/api", transactionRoutes);
+app.use("/api", promotionRouter);
+app.use("/api", notificationRouter);
 
 //listen to port
 app.listen(process.env.PORT, () => {

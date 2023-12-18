@@ -1,7 +1,16 @@
 import jwt from "jsonwebtoken";
 
 export const authenticateToken = async (req, res, next) => {
-  const token = req.headers.authorization;
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res
+      .status(401)
+      .json({ error: "Access denied. Invalid token format." });
+  }
+
+  const token = authHeader.substring(7);
+
   if (!token) {
     return res.status(401).json({ error: "Access denied. Token missing." });
   }
@@ -15,4 +24,3 @@ export const authenticateToken = async (req, res, next) => {
 
   next();
 };
-
